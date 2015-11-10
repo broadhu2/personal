@@ -98,6 +98,10 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 		return root == null;
 	}
 	
+	public boolean isBalanced() {
+		return Math.abs(height(root.left) - height(root.right)) < 2;
+	}
+	
 	public int size() {
 		return elements;
 	}
@@ -138,23 +142,8 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 			System.err.println("Error: tree is empty.");
 			return null;
 		}
-		
-		Queue<Node<K,V>> queue = new LinkedList<Node<K,V>>();
-		List<K> keys = new ArrayList<K>();
-		queue.add(root);
-		
-		// level-order traversal
-		while (!queue.isEmpty()) {
-			Node<K,V> node = queue.remove();
-			keys.add(node.key);
-			if (node.hasLeft()) {
-				queue.add(node.left);
-			}
-			if (node.hasRight()) {
-				queue.add(node.right);
-			}
-		}
-		
+		List<K> keys = new ArrayList<K>(size());
+		inOrderKeys(root, keys);
 		return keys;
 	}
 	
@@ -163,23 +152,8 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 			System.err.println("Error: tree is empty.");
 			return null;
 		}
-		
-		// level-order traversal
-		Queue<Node<K,V>> queue = new LinkedList<Node<K,V>>();
-		List<V> values = new ArrayList<V>();
-		queue.add(root);
-		
-		while (!queue.isEmpty()) {
-			Node<K,V> node = queue.remove();
-			values.add(node.value);
-			if (node.hasLeft()) {
-				queue.add(node.left);
-			}
-			if (node.hasRight()) {
-				queue.add(node.right);
-			}
-		}
-		
+		List<V> values = new ArrayList<V>(size());
+		inOrderValues(root, values);
 		return values;
 	}
 	
@@ -188,24 +162,77 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 			System.err.println("Error: tree is empty.");
 			return null;
 		}
+		List<Entry<K,V>> entries = new ArrayList<Entry<K,V>>(size());
+		inOrderEntries(root, entries);
+		return entries;
+	}
+	
+	public List<List<K>> levelOrderKeys() {
+		if (isEmpty()) {
+			return null;
+		}
 		
 		Queue<Node<K,V>> queue = new LinkedList<Node<K,V>>();
-		List<Entry<K,V>> entries = new ArrayList<Entry<K,V>>();
+		List<List<K>> listOfLevels = new ArrayList<List<K>>();
+		List<K> level = new ArrayList<K>();
+		int currLevelCount = 1, nextLevelCount = 0;
 		queue.add(root);
 		
-		// level-order traversal
 		while (!queue.isEmpty()) {
 			Node<K,V> node = queue.remove();
-			entries.add(new AbstractMap.SimpleEntry<K,V>(node.key, node.value));
+			currLevelCount--;
+			level.add(node.key);
 			if (node.hasLeft()) {
 				queue.add(node.left);
+				nextLevelCount++;
 			}
 			if (node.hasRight()) {
 				queue.add(node.right);
+				nextLevelCount++;
+			}
+			if (currLevelCount == 0) {
+				listOfLevels.add(level);
+				level = new ArrayList<K>();
+				currLevelCount = nextLevelCount;
+				nextLevelCount = 0;
 			}
 		}
 		
-		return entries;
+		return listOfLevels;
+	}
+	
+	public List<List<Entry<K,V>>> levelOrderEntries() {
+		if (isEmpty()) {
+			return null;
+		}
+		
+		Queue<Node<K,V>> queue = new LinkedList<Node<K,V>>();
+		List<List<Entry<K,V>>> listOfLevels = new ArrayList<List<Entry<K,V>>>();
+		List<Entry<K,V>> level = new ArrayList<Entry<K,V>>();
+		int currLevelCount = 1, nextLevelCount = 0;
+		queue.add(root);
+		
+		while (!queue.isEmpty()) {
+			Node<K,V> node = queue.remove();
+			currLevelCount--;
+			level.add(new AbstractMap.SimpleEntry<K,V>(node.key, node.value));
+			if (node.hasLeft()) {
+				queue.add(node.left);
+				nextLevelCount++;
+			}
+			if (node.hasRight()) {
+				queue.add(node.right);
+				nextLevelCount++;
+			}
+			if (currLevelCount == 0) {
+				listOfLevels.add(level);
+				level = new ArrayList<Entry<K,V>>();
+				currLevelCount = nextLevelCount;
+				nextLevelCount = 0;
+			}
+		}
+		
+		return listOfLevels;
 	}
 	
 	public K lowerKey(K key) {
@@ -319,9 +346,9 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 		
 		// make a deep copy of the other tree
 		Node<K,V> nodeCopy = new Node<K,V>(node.key, node.value);
+		nodeCopy.height = node.height;
 		nodeCopy.left  = copy(node.left);
 		nodeCopy.right = copy(node.right);
-		nodeCopy.height = Math.max(height(node.left), height(node.right)) + 1;
 		return nodeCopy;
 	}
 
@@ -474,6 +501,33 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 			return -1;
 		}
 		return node.height;
+	}
+	
+	private void inOrderKeys(Node<K,V> node, List<K> keys) {
+		if (node == null) {
+			return;
+		}		
+		inOrderKeys(node.left, keys);
+		keys.add(node.key);
+		inOrderKeys(node.right, keys);
+	}
+	
+	private void inOrderValues(Node<K,V> node, List<V> values) {
+		if (node == null) {
+			return;
+		}		
+		inOrderValues(node.left, values);
+		values.add(node.value);
+		inOrderValues(node.right, values);
+	}
+	
+	private void inOrderEntries(Node<K,V> node, List<Entry<K,V>> entries) {
+		if (node == null) {
+			return;
+		}		
+		inOrderEntries(node.left, entries);
+		entries.add(new AbstractMap.SimpleEntry<K,V>(node.key, node.value));
+		inOrderEntries(node.right, entries);
 	}
 	
 	private boolean contains(Node<K,V> node, K key) {

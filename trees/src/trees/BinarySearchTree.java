@@ -47,7 +47,7 @@ public interface BinarySearchTree<K extends Comparable<? super K>, V> {
 	
 	/**
 	 * Checks if the tree contains given key.
-	 * @param key
+	 * @param key The key to check.
 	 * @return true if the tree contains key; false otherwise.
 	 */
 	public boolean contains(K key);
@@ -62,6 +62,12 @@ public interface BinarySearchTree<K extends Comparable<? super K>, V> {
 	 * @return true if tree is empty; false otherwise.
 	 */
 	public boolean isEmpty();
+	
+	/**
+	 * Checks if the tree is height balanced.
+	 * @return true if the tree is balanced; false otherwise.
+	 */
+	public boolean isBalanced();
 	
 	/**
 	 * Returns the number of entry nodes in the tree.
@@ -82,7 +88,7 @@ public interface BinarySearchTree<K extends Comparable<? super K>, V> {
 	public void print();
 	
 	/**
-	 * Retrieves a level-order (sorted) list of keys contained in the tree.
+	 * Retrieves an in-order (sorted) list of keys contained in the tree.
 	 * @return A list of keys contained in the tree.
 	 */
 	public List<K> keys();
@@ -100,34 +106,48 @@ public interface BinarySearchTree<K extends Comparable<? super K>, V> {
 	public List<Entry<K,V>> entries();
 	
 	/**
+	 * Retrieves a list of value groupings contained in the tree sorted in 
+	 * level-order.
+	 * @return A list of lists of values per level contained in the tree.
+	 */
+	public List<List<K>> levelOrderKeys();
+	
+	/**
+	 * Retrieves a list of key-value entry groupings contained in the tree 
+	 * sorted in level-order.
+	 * @return A list of lists of entries per level contained in the tree.
+	 */
+	public List<List<Entry<K,V>>> levelOrderEntries();
+	
+	/**
 	 * Returns the greatest key strictly less than the given key, or null if 
 	 * there is no such key.
-	 * @param key
-	 * @return
+	 * @param key The key to check.
+	 * @return The closest key strictly less than the given key.
 	 */
 	public K lowerKey(K key);
 	
 	/**
 	 * Returns a key-value entry associated with the greatest key strictly less
 	 * than the given key, or null if there is no such key.
-	 * @param key
-	 * @return
+	 * @param key The key to check.
+	 * @return The closest entry strictly less than the given key's.
 	 */
 	public Entry<K,V> lowerEntry(K key);
 	
 	/**
 	 * Returns the least key strictly greater than the given key, or null if 
 	 * there is no such key.
-	 * @param key
-	 * @return
+	 * @param key The key to check.
+	 * @return The closest key strictly greater than the given key.
 	 */
 	public K higherKey(K key);
 	
 	/**
 	 * Returns a key-value mapping associated with the least key strictly greater 
 	 * than the given key, or null if there is no such key.
-	 * @param key
-	 * @return
+	 * @param key The key to check.
+	 * @return The closest entry strictly greater than the given key's.
 	 */
 	public Entry<K,V> higherEntry(K key);
 	

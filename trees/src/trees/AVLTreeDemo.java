@@ -30,7 +30,7 @@ public class AVLTreeDemo {
 	}
 	
 	public static void testInsert(BinarySearchTree<Integer, Integer> tree) {
-		List<Integer> list = randomList();		
+		List<Integer> list = randomList();
 		for (int elem : list) {
 			tree.insert(elem, elem);
 			tree.print();

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-
 import java.util.Queue;
 
 public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearchTree<K,V> {
@@ -99,6 +98,9 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 	}
 	
 	public boolean isBalanced() {
+		if (isEmpty()) {
+			return true;
+		}
 		return Math.abs(height(root.left) - height(root.right)) < 2;
 	}
 	
@@ -125,8 +127,7 @@ public class AVLTree<K extends Comparable<? super K>, V> implements BinarySearch
 		String spaces = new String(new char[outputWidth]).replace('\0', ' ');
 		List<StringBuilder> output = new ArrayList<StringBuilder>(outputHeight);
 		for (int i = 0; i < outputHeight; i++) {
-			StringBuilder filler = new StringBuilder(spaces);
-			output.add(filler);
+			output.add(new StringBuilder(spaces));
 		}
 		
 		// recursive helper function to print the tree
